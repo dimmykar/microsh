@@ -45,7 +45,13 @@ extern "C" {
  * \{
  */
 
-
+/**
+ * \brief           Maximum number of different commands to be registered
+ *
+ */
+#ifndef MICROSH_CFG_NUM_OF_CMDS
+#define MICROSH_CFG_NUM_OF_CMDS                 10
+#endif
 
 /**
  * \}
