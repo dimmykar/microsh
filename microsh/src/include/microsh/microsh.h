@@ -27,6 +27,10 @@
 #ifndef MICROSH_HDR_H
 #define MICROSH_HDR_H
 
+#include <stdint.h>
+#include "microsh_config.h"
+#include "microrl.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
@@ -59,8 +63,14 @@ typedef enum {
     microshERRPAR = 0x02,                        /*!< Parameter error */
 } microshr_t;
 
-microshr_t    microsh_init(void);
+/**
+ * \brief           MicroSH instance
+ */
+typedef struct {
+    microrl_t mrl;                               /*!< MicroRL context instance */
+} microsh_t;
 
+microshr_t    microsh_init(microsh_t* msh, microrl_output_fn out_fn);
 
 /**
  * \}

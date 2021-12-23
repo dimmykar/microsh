@@ -24,20 +24,42 @@
  * Version:         $_version_$
  */
 
+#include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
+#include "microrl.h"
 #include "microsh.h"
 
-microsh_t microsh;
+static int prv_execute(microrl_t* mrl, int argc, const char* const *argv);
 
 /**
  * \brief           Init and prepare Shell stack for operation
  * \note            Function must be called when mcu initializes.
  *
+ * \param[in,out]   msh: microSH instance
+ * \param[in]       out_fn: String output callback function for microrl
  * \return          \ref microshOK on success, member of \ref microshr_t enumeration otherwise
  */
-microshr_t microsh_init(void) {
+microshr_t microsh_init(microsh_t* msh, microrl_output_fn out_fn) {
     microshr_t res = microshOK;
 
-
+    if (msh == NULL || out_fn == NULL) {
+        res = microshERRPAR;
+    } else {
+        memset(msh, 0x00, sizeof(microsh_t));
+        microrl_init(&msh->mrl, out_fn, prv_execute);
+    }
 
     return res;
+}
+
+/**
+ * \brief           Command execute callback general function
+ * \param[in]       mrl: \ref microrl_t working instance
+ * \param[in]       argc: argument count
+ * \param[in]       argv: pointer array to token string
+ * \return          '0' on success, '1' otherwise
+ */
+static int prv_execute(microrl_t* mrl, int argc, const char* const *argv) {
+    return 0;
 }
