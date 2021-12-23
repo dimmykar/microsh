@@ -30,6 +30,19 @@
 #include "microrl.h"
 #include "microsh.h"
 
+/**
+ * \brief           Shell command structure
+ */
+typedef struct {
+    const char* name;                           /*!< Command name to search for match */
+    const char* desc;                           /*!< Command description for help */
+    microsh_cmd_fn cmd_fn;                      /*!< Command execute function to call */
+} microsh_cmd_t;
+
+/* Array of all commands */
+static microsh_cmd_t cmds[MICROSH_CFG_NUM_OF_CMDS];
+static size_t cmds_index;
+
 static int prv_execute(microrl_t* mrl, int argc, const char* const *argv);
 
 /**
@@ -51,6 +64,31 @@ microshr_t microsh_init(microsh_t* msh, microrl_output_fn out_fn) {
     }
 
     return res;
+}
+
+/**
+ * \brief           Register new command to shell
+ * \param[in]       cmd_name: Command name. This one is used when entering shell command
+ * \param[in]       cmd_fn: Function to call on command match
+ * \param[in]       desc: Custom command description
+ * \return          \ref microshOK on success, member of \ref microshr_t otherwise
+ */
+microshr_t microsh_register_cmd(const char* cmd_name, microsh_cmd_fn cmd_fn, const char* desc) {
+    if (cmd_name == NULL || cmd_fn == NULL
+        || strlen(cmd_name) == 0) {
+        return microshERRPAR;
+    }
+
+    /* Check for memory available */
+    if (cmds_index < MICROSH_ARRAYSIZE(cmds)) {
+        cmds[cmds_index].name = cmd_name;
+        cmds[cmds_index].cmd_fn = cmd_fn;
+        cmds[cmds_index].desc = desc;
+
+        ++cmds_index;
+        return microshOK;
+    }
+    return microshERRMEM;
 }
 
 /**

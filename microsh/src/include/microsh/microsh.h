@@ -55,12 +55,21 @@ extern "C" {
 #define MICROSH_ARRAYSIZE(x)        (sizeof(x) / sizeof((x)[0]))
 
 /**
+ * \brief           Command execute function prototype
+ * \param[in]       argc: Number of arguments
+ * \param[in]       argv: Pointer to arguments
+ * \return          `0` on success, `-1` otherwise
+ */
+typedef int      (*microsh_cmd_fn)(int argc, const char* const *argv);
+
+/**
  * \brief           MicroSH result enumeration
  */
 typedef enum {
     microshOK = 0x00,                            /*!< Everything OK */
     microshERR = 0x01,                           /*!< Common error */
     microshERRPAR = 0x02,                        /*!< Parameter error */
+    microshERRMEM = 0x03,                        /*!< Memory error */
 } microshr_t;
 
 /**
@@ -71,6 +80,7 @@ typedef struct {
 } microsh_t;
 
 microshr_t    microsh_init(microsh_t* msh, microrl_output_fn out_fn);
+microshr_t    microsh_register_cmd(const char* cmd_name, microsh_cmd_fn cmd_fn, const char* desc);
 
 /**
  * \}
