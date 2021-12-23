@@ -99,5 +99,33 @@ microshr_t microsh_register_cmd(const char* cmd_name, microsh_cmd_fn cmd_fn, con
  * \return          '0' on success, '1' otherwise
  */
 static int prv_execute(microrl_t* mrl, int argc, const char* const *argv) {
+    microsh_cmd_t* cmd = NULL;
+
+    /* Check for command */
+    if (argc > 0 && cmds_index > 0) {
+        size_t arg_len = strlen(argv[0]);
+
+        /* Process all commands */
+        for (size_t i = 0; i < cmds_index; ++i) {
+            if (arg_len == strlen(cmds[i].name) && strncmp(cmds[i].name, argv[0], arg_len) == 0) {
+                cmd = &cmds[i];
+                break;
+            }
+        }
+    }
+
+    /* Valid command ready? */
+    if (cmd != NULL) {
+        if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 'h' && argv[1][2] == '\0') {
+            mrl->out_fn(mrl, cmd->desc);
+            mrl->out_fn(mrl, "\r\n");
+        } else {
+            cmd->cmd_fn(argc, argv);
+        }
+    } else {
+        mrl->out_fn(mrl, "Unknown command\r\n");
+        return 1;
+    }
+
     return 0;
 }
