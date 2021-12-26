@@ -106,6 +106,7 @@ microshr_t microsh_register_cmd(const char* cmd_name, microsh_cmd_fn cmd_fn, con
         ++cmds_index;
         return microshOK;
     }
+
     return microshERRMEM;
 }
 
@@ -119,8 +120,13 @@ microshr_t microsh_register_cmd(const char* cmd_name, microsh_cmd_fn cmd_fn, con
 static int prv_execute(microrl_t* mrl, int argc, const char* const *argv) {
     microsh_cmd_t* cmd = NULL;
 
+    /* Check for empty command buffer */
+    if (argc == 0) {
+        return 0;
+    }
+
     /* Check for command */
-    if (argc > 0 && cmds_index > 0) {
+    if (cmds_index > 0) {
         size_t arg_len = strlen(argv[0]);
 
         /* Process all commands */
