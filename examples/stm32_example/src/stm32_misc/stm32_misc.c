@@ -110,13 +110,13 @@ void init(void) {
  * \brief           Register all commands used by shell
  * \return          \ref microshOK on success, member of \ref microshr_t otherwise
  */
-microshr_t register_all_commands(void)
+microshr_t register_all_commands(microsh_t* msh)
 {
     microshr_t result = microshOK;
 
-    result |= microsh_register_cmd(_CMD_HELP, help_cmd, NULL);
-    result |= microsh_register_cmd(_CMD_CLEAR, clear_screen_cmd, NULL);
-    result |= microsh_register_cmd(_CMD_SERNUM, sernum_cmd, NULL);
+    result |= microsh_register_cmd(msh, _CMD_HELP, help_cmd, NULL);
+    result |= microsh_register_cmd(msh, _CMD_CLEAR, clear_screen_cmd, NULL);
+    result |= microsh_register_cmd(msh, _CMD_SERNUM, sernum_cmd, NULL);
 
     return result;
 }

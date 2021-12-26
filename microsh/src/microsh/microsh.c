@@ -48,19 +48,6 @@
 #include "microrl.h"
 #include "microsh.h"
 
-/**
- * \brief           Shell command structure
- */
-typedef struct {
-    const char* name;                           /*!< Command name to search for match */
-    const char* desc;                           /*!< Command description for help */
-    microsh_cmd_fn cmd_fn;                      /*!< Command execute function to call */
-} microsh_cmd_t;
-
-/* Array of all commands */
-static microsh_cmd_t cmds[MICROSH_CFG_NUM_OF_CMDS];
-static size_t cmds_index;
-
 static int prv_execute(microrl_t* mrl, int argc, const char* const *argv);
 
 /**
@@ -91,19 +78,19 @@ microshr_t microsh_init(microsh_t* msh, microrl_output_fn out_fn) {
  * \param[in]       desc: Custom command description
  * \return          \ref microshOK on success, member of \ref microshr_t otherwise
  */
-microshr_t microsh_register_cmd(const char* cmd_name, microsh_cmd_fn cmd_fn, const char* desc) {
+microshr_t microsh_register_cmd(microsh_t* msh, const char* cmd_name, microsh_cmd_fn cmd_fn, const char* desc) {
     if (cmd_name == NULL || cmd_fn == NULL
         || strlen(cmd_name) == 0) {
         return microshERRPAR;
     }
 
     /* Check for memory available */
-    if (cmds_index < MICROSH_ARRAYSIZE(cmds)) {
-        cmds[cmds_index].name = cmd_name;
-        cmds[cmds_index].cmd_fn = cmd_fn;
-        cmds[cmds_index].desc = desc;
+    if (msh->cmds_index < MICROSH_ARRAYSIZE(msh->cmds)) {
+        msh->cmds[msh->cmds_index].name = cmd_name;
+        msh->cmds[msh->cmds_index].cmd_fn = cmd_fn;
+        msh->cmds[msh->cmds_index].desc = desc;
 
-        ++cmds_index;
+        ++msh->cmds_index;
         return microshOK;
     }
 
@@ -119,6 +106,7 @@ microshr_t microsh_register_cmd(const char* cmd_name, microsh_cmd_fn cmd_fn, con
  */
 static int prv_execute(microrl_t* mrl, int argc, const char* const *argv) {
     microsh_cmd_t* cmd = NULL;
+    microsh_t* msh = (microsh_t*)mrl;
 
     /* Check for empty command buffer */
     if (argc == 0) {
@@ -126,13 +114,13 @@ static int prv_execute(microrl_t* mrl, int argc, const char* const *argv) {
     }
 
     /* Check for command */
-    if (cmds_index > 0) {
+    if (msh->cmds_index > 0) {
         size_t arg_len = strlen(argv[0]);
 
         /* Process all commands */
-        for (size_t i = 0; i < cmds_index; ++i) {
-            if (arg_len == strlen(cmds[i].name) && strncmp(cmds[i].name, argv[0], arg_len) == 0) {
-                cmd = &cmds[i];
+        for (size_t i = 0; i < msh->cmds_index; ++i) {
+            if (arg_len == strlen(msh->cmds[i].name) && strncmp(msh->cmds[i].name, argv[0], arg_len) == 0) {
+                cmd = &msh->cmds[i];
                 break;
             }
         }
@@ -142,12 +130,12 @@ static int prv_execute(microrl_t* mrl, int argc, const char* const *argv) {
     if (cmd != NULL) {
         if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 'h' && argv[1][2] == '\0') {
             mrl->out_fn(mrl, cmd->desc);
-            mrl->out_fn(mrl, "\r\n");
+            mrl->out_fn(mrl, MICRORL_CFG_END_LINE);
         } else {
             cmd->cmd_fn(argc, argv);
         }
     } else {
-        mrl->out_fn(mrl, "Unknown command\r\n");
+        mrl->out_fn(mrl, "Unknown command"MICRORL_CFG_END_LINE);
         return 1;
     }
 

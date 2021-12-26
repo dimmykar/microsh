@@ -63,6 +63,15 @@ extern "C" {
 typedef int      (*microsh_cmd_fn)(int argc, const char* const *argv);
 
 /**
+ * \brief           Shell command structure
+ */
+typedef struct {
+    const char* name;                           /*!< Command name to search for match */
+    const char* desc;                           /*!< Command description for help */
+    microsh_cmd_fn cmd_fn;                      /*!< Command execute function to call */
+} microsh_cmd_t;
+
+/**
  * \brief           MicroSH result enumeration
  */
 typedef enum {
@@ -77,10 +86,12 @@ typedef enum {
  */
 typedef struct {
     microrl_t mrl;                               /*!< MicroRL context instance */
+    microsh_cmd_t cmds[MICROSH_CFG_NUM_OF_CMDS]; /*!< Array of all registered commands */
+    size_t cmds_index;                           /*!< Registered command index counter */
 } microsh_t;
 
 microshr_t    microsh_init(microsh_t* msh, microrl_output_fn out_fn);
-microshr_t    microsh_register_cmd(const char* cmd_name, microsh_cmd_fn cmd_fn, const char* desc);
+microshr_t    microsh_register_cmd(microsh_t* msh, const char* cmd_name, microsh_cmd_fn cmd_fn, const char* desc);
 
 /**
  * \}

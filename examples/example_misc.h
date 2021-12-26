@@ -33,7 +33,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 void       init(void);
-microshr_t register_all_commands(void);
+microshr_t register_all_commands(microsh_t* msh);
 int        microrl_print(microrl_t* mrl, const char* str);
 char       get_char(void);
 

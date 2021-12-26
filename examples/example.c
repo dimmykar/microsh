@@ -44,7 +44,7 @@ int main (void/*int argc, char** argv*/) {
 
     /* Initialize library with microsh instance and print callback placed in microrl instance */
     microsh_init(psh, microrl_print);
-    if (register_all_commands() != microshOK) {
+    if (register_all_commands(psh) != microshOK) {
         microrl_print(&psh->mrl, "No memory to register all commands!"MICRORL_CFG_END_LINE);
     }
 
