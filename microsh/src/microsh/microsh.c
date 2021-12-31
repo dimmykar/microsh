@@ -134,7 +134,8 @@ static int prv_execute(microrl_t* mrl, int argc, const char* const *argv) {
             cmd->cmd_fn(argc, argv);
         }
     } else {
-        mrl->out_fn(mrl, "Unknown command"MICRORL_CFG_END_LINE);
+        mrl->out_fn(mrl, argv[0]);
+        mrl->out_fn(mrl, ": Unknown command"MICRORL_CFG_END_LINE);
         return 1;
     }
 
