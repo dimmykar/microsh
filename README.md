@@ -63,4 +63,4 @@ See examples in `examples` folder for minimal library usage.
 
 
 Author: Dmitry Karasev aka dimmykar (karasevsdmitry@yandex.ru)<br>
-xx.xx.xxxx
+15.01.2022

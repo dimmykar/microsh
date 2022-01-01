@@ -21,7 +21,7 @@
  * This file is part of microSH - Shell for Embedded Systems library.
  *
  * Author:          Dmitry KARASEV <karasevsdmitry@yandex.ru>
- * Version:         $_version_$
+ * Version:         0.1.0
  */
 
 #include <string.h>
