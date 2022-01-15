@@ -45,7 +45,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include "microrl.h"
 #include "microsh.h"
 
 static int prv_execute(microrl_t* mrl, int argc, const char* const *argv);
@@ -140,4 +139,15 @@ static int prv_execute(microrl_t* mrl, int argc, const char* const *argv) {
     }
 
     return 0;
+}
+
+/**
+ * \brief           Hook called after command execution
+ * \param[in,out]   mrl: \ref microrl_t working instance
+ * \param[in]       res: Return value of the command execution callback
+ * \param[in]       argc: Number of arguments in command line
+ * \param[in]       argv: Pointer to argument list
+ */
+void post_exec_hook(microrl_t* mrl, int res, int argc, const char* const *argv) {
+
 }
