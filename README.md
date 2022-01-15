@@ -54,7 +54,7 @@ The list of configurations are available in the `microsh_config.h` file with def
 
 User configurations file `microsh_user_config.h` is used to overwrite default configuration values defined in `microsh_config.h` file without overwrite the file.
 
-If you prefer to avoid using user configurations file, application must define a global symbol `MICROSH_IGNORE_USER_OPTS` and `MICRORL_IGNORE_USER_OPTS`, visible across entire application. This can be achieved with `-D` compiler option.
+If you prefer to avoid using user configurations file, application must define a global symbol `MICROSH_IGNORE_USER_CONFIGS` and `MICRORL_IGNORE_USER_CONFIGS`, visible across entire application. This can be achieved with `-D` compiler option.
 
 ## Minimal example
 

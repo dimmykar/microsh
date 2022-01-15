@@ -31,9 +31,9 @@
 /* #define MICROSH_IGNORE_USER_OPTS */
 
 /* Include application options */
-#ifndef MICROSH_IGNORE_USER_OPTS
+#ifndef MICROSH_IGNORE_USER_CONFIGS
 #include "microsh_user_config.h"
-#endif /* MICROSH_IGNORE_USER_OPTS */
+#endif /* MICROSH_IGNORE_USER_CONFIGS */
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,12 +50,16 @@ extern "C" {
  *
  */
 #ifndef MICROSH_CFG_NUM_OF_CMDS
-#define MICROSH_CFG_NUM_OF_CMDS                 10
+#define MICROSH_CFG_NUM_OF_CMDS               10
 #endif
 
 /**
  * \}
  */
+
+#define MICROSH_VERSION_MAJOR                 0
+#define MICROSH_VERSION_MINOR                 0
+#define MICROSH_VERSION_PATCH                 1
 
 #ifdef __cplusplus
 }
