@@ -111,7 +111,7 @@ static int prv_execute(microrl_t* mrl, int argc, const char* const *argv) {
 
     /* Check for empty command buffer */
     if (argc == 0) {
-        return 0;
+        return microshEXEC_NO_CMD;
     }
 
     /* Check for command */
@@ -131,14 +131,14 @@ static int prv_execute(microrl_t* mrl, int argc, const char* const *argv) {
     if (cmd == NULL) {
         mrl->out_fn(mrl, argv[0]);
         mrl->out_fn(mrl, ": Unknown command"MICRORL_CFG_END_LINE);
-        return 1;
+        return microshEXEC_ERROR_UNK_CMD;
     }
 
     /* Check for arguments */
     if (argc > cmd->arg_num) {
         mrl->out_fn(mrl, argv[0]);
         mrl->out_fn(mrl, ": Too many arguments"MICRORL_CFG_END_LINE);
-        return 1;
+        return microshEXEC_ERROR_MAX_ARGS;
     }
 
     /* Run the command */
@@ -149,7 +149,7 @@ static int prv_execute(microrl_t* mrl, int argc, const char* const *argv) {
         cmd->cmd_fn(msh, argc, argv);
     }
 
-    return 0;
+    return microshEXEC_OK;
 }
 
 /**

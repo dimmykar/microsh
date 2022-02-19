@@ -54,6 +54,14 @@ extern "C" {
  */
 #define MICROSH_ARRAYSIZE(x)        (sizeof(x) / sizeof((x)[0]))
 
+typedef enum {
+    microshEXEC_OK             = 0x00,          /*!< Successuful command execute */
+    microshEXEC_NO_CMD         = 0x01,          /*!< Execute empty command */
+    microshEXEC_ERROR          = 0x02,          /*!< Command execute generic error */
+    microshEXEC_ERROR_UNK_CMD  = 0x03,          /*!< Unknown command */
+    microshEXEC_ERROR_MAX_ARGS = 0x04,          /*!< To many arguments in command */
+} microsh_execr_t;
+
 /* Forward declarations */
 struct microsh;
 

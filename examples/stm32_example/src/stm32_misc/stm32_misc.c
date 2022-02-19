@@ -266,7 +266,7 @@ int help_cmd(microsh_t* msh, int argc, const char* const *argv) {
     print("\tsernum VALUE        - set serial number value"_ENDLINE_SEQ);
     print("\tsernum save         - save serial number value to flash"_ENDLINE_SEQ);
 
-    return 0;
+    return microshEXEC_OK;
 }
 
 /**
@@ -280,7 +280,7 @@ int clear_screen_cmd(microsh_t* msh, int argc, const char* const *argv) {
     print("\033[2J");    /* ESC seq for clear entire screen */
     print("\033[H");     /* ESC seq for move cursor at left-top corner */
 
-    return 0;
+    return microshEXEC_OK;
 }
 
 /**
@@ -303,10 +303,10 @@ int sernum_cmd(microsh_t* msh, int argc, const char* const *argv) {
         }
     } else {
         print("Read or specify serial number"_ENDLINE_SEQ);
-        return 1;
+        return microshEXEC_ERROR;
     }
 
-    return 0;
+    return microshEXEC_OK;
 }
 
 #if MICRORL_CFG_USE_COMPLETE || __DOXYGEN__
