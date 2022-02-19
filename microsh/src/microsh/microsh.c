@@ -129,15 +129,11 @@ static int prv_execute(microrl_t* mrl, int argc, const char* const *argv) {
 
     /* Valid command ready? */
     if (cmd == NULL) {
-        mrl->out_fn(mrl, argv[0]);
-        mrl->out_fn(mrl, ": Unknown command"MICRORL_CFG_END_LINE);
         return microshEXEC_ERROR_UNK_CMD;
     }
 
     /* Check for arguments */
     if (argc > cmd->arg_num) {
-        mrl->out_fn(mrl, argv[0]);
-        mrl->out_fn(mrl, ": Too many arguments"MICRORL_CFG_END_LINE);
         return microshEXEC_ERROR_MAX_ARGS;
     }
 
@@ -160,5 +156,23 @@ static int prv_execute(microrl_t* mrl, int argc, const char* const *argv) {
  * \param[in]       argv: Pointer to argument list
  */
 void post_exec_hook(microrl_t* mrl, int res, int argc, const char* const *argv) {
+    microsh_execr_t exec_res = (microsh_execr_t)res;
 
+    if (exec_res > microshEXEC_ERROR) {
+        mrl->out_fn(mrl, argv[0]);
+        mrl->out_fn(mrl, ": ");
+
+        switch (exec_res) {
+            case microshEXEC_ERROR_UNK_CMD: {
+                mrl->out_fn(mrl, "Unknown command"MICRORL_CFG_END_LINE);
+                break;
+            }
+            case microshEXEC_ERROR_MAX_ARGS: {
+                mrl->out_fn(mrl, "Too many arguments"MICRORL_CFG_END_LINE);
+                break;
+            }
+            default:
+                break;
+        }
+    }
 }
