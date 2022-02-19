@@ -54,19 +54,24 @@ extern "C" {
  */
 #define MICROSH_ARRAYSIZE(x)        (sizeof(x) / sizeof((x)[0]))
 
+/* Forward declarations */
+struct microsh;
+
 /**
  * \brief           Command execute function prototype
+ * \param[in]       msh: microSH instance
  * \param[in]       argc: Number of arguments
  * \param[in]       argv: Pointer to arguments
  * \return          `0` on success, `-1` otherwise
  */
-typedef int      (*microsh_cmd_fn)(int argc, const char* const *argv);
+typedef int      (*microsh_cmd_fn)(struct microsh* msh, int argc, const char* const *argv);
 
 /**
  * \brief           Shell command structure
  */
 typedef struct {
     const char* name;                           /*!< Command name to search for match */
+    size_t arg_num;                             /*!< Number of arguments */
     const char* desc;                           /*!< Command description for help */
     microsh_cmd_fn cmd_fn;                      /*!< Command execute function to call */
 } microsh_cmd_t;
@@ -84,14 +89,15 @@ typedef enum {
 /**
  * \brief           MicroSH instance
  */
-typedef struct {
+typedef struct microsh {
     microrl_t mrl;                               /*!< MicroRL context instance */
     microsh_cmd_t cmds[MICROSH_CFG_NUM_OF_CMDS]; /*!< Array of all registered commands */
     size_t cmds_index;                           /*!< Registered command index counter */
 } microsh_t;
 
 microshr_t    microsh_init(microsh_t* msh, microrl_output_fn out_fn);
-microshr_t    microsh_register_cmd(microsh_t* msh, const char* cmd_name, microsh_cmd_fn cmd_fn, const char* desc);
+microshr_t    microsh_register_cmd(microsh_t* msh, size_t arg_num, const char* cmd_name,
+                                       microsh_cmd_fn cmd_fn, const char* desc);
 
 /**
  * \}

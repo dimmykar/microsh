@@ -77,7 +77,8 @@ microshr_t microsh_init(microsh_t* msh, microrl_output_fn out_fn) {
  * \param[in]       desc: Custom command description
  * \return          \ref microshOK on success, member of \ref microshr_t otherwise
  */
-microshr_t microsh_register_cmd(microsh_t* msh, const char* cmd_name, microsh_cmd_fn cmd_fn, const char* desc) {
+microshr_t microsh_register_cmd(microsh_t* msh, size_t arg_num, const char* cmd_name,
+                                    microsh_cmd_fn cmd_fn, const char* desc) {
     if (cmd_name == NULL || cmd_fn == NULL
         || strlen(cmd_name) == 0) {
         return microshERRPAR;
@@ -86,6 +87,7 @@ microshr_t microsh_register_cmd(microsh_t* msh, const char* cmd_name, microsh_cm
     /* Check for memory available */
     if (msh->cmds_index < MICROSH_ARRAYSIZE(msh->cmds)) {
         msh->cmds[msh->cmds_index].name = cmd_name;
+        msh->cmds[msh->cmds_index].arg_num = arg_num;
         msh->cmds[msh->cmds_index].cmd_fn = cmd_fn;
         msh->cmds[msh->cmds_index].desc = desc;
 
@@ -126,17 +128,25 @@ static int prv_execute(microrl_t* mrl, int argc, const char* const *argv) {
     }
 
     /* Valid command ready? */
-    if (cmd != NULL) {
-        if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 'h' && argv[1][2] == '\0') {
-            mrl->out_fn(mrl, cmd->desc);
-            mrl->out_fn(mrl, MICRORL_CFG_END_LINE);
-        } else {
-            cmd->cmd_fn(argc, argv);
-        }
-    } else {
+    if (cmd == NULL) {
         mrl->out_fn(mrl, argv[0]);
         mrl->out_fn(mrl, ": Unknown command"MICRORL_CFG_END_LINE);
         return 1;
+    }
+
+    /* Check for arguments */
+    if (argc > cmd->arg_num) {
+        mrl->out_fn(mrl, argv[0]);
+        mrl->out_fn(mrl, ": Too many arguments"MICRORL_CFG_END_LINE);
+        return 1;
+    }
+
+    /* Run the command */
+    if (argc == 2 && argv[1][0] == '-' && argv[1][1] == 'h' && argv[1][2] == '\0') {
+        mrl->out_fn(mrl, cmd->desc);
+        mrl->out_fn(mrl, MICRORL_CFG_END_LINE);
+    } else {
+        cmd->cmd_fn(msh, argc, argv);
     }
 
     return 0;

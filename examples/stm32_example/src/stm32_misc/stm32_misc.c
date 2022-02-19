@@ -68,9 +68,9 @@ char* compl_word[_NUM_OF_CMD + 1];
 /* Variable changeable with commands */
 uint32_t device_sn = 0;
 
-static int help_cmd(int argc, const char* const *argv);
-static int clear_screen_cmd(int argc, const char* const *argv);
-static int sernum_cmd(int argc, const char* const *argv);
+static int help_cmd(microsh_t* msh, int argc, const char* const *argv);
+static int clear_screen_cmd(microsh_t* msh, int argc, const char* const *argv);
+static int sernum_cmd(microsh_t* msh, int argc, const char* const *argv);
 
 /**
  * \brief           Init STM32F4 platform
@@ -114,9 +114,9 @@ microshr_t register_all_commands(microsh_t* msh)
 {
     microshr_t result = microshOK;
 
-    result |= microsh_register_cmd(msh, _CMD_HELP, help_cmd, NULL);
-    result |= microsh_register_cmd(msh, _CMD_CLEAR, clear_screen_cmd, NULL);
-    result |= microsh_register_cmd(msh, _CMD_SERNUM, sernum_cmd, NULL);
+    result |= microsh_register_cmd(msh, 1, _CMD_HELP, help_cmd, NULL);
+    result |= microsh_register_cmd(msh, 1, _CMD_CLEAR, clear_screen_cmd, NULL);
+    result |= microsh_register_cmd(msh, 2, _CMD_SERNUM, sernum_cmd, NULL);
 
     return result;
 }
@@ -253,7 +253,9 @@ static void save_sernum(void) {
  * \param[in]       argc: argument count
  * \param[in]       argv: pointer array to token string
  */
-int help_cmd(int argc, const char* const *argv) {
+int help_cmd(microsh_t* msh, int argc, const char* const *argv) {
+    MICRORL_UNUSED(msh);
+
     print("MicroSH library DEMO v");
     print(_STM32_DEMO_VER);
     print(_ENDLINE_SEQ);
@@ -272,7 +274,9 @@ int help_cmd(int argc, const char* const *argv) {
  * \param[in]       argc: argument count
  * \param[in]       argv: pointer array to token string
  */
-int clear_screen_cmd(int argc, const char* const *argv) {
+int clear_screen_cmd(microsh_t* msh, int argc, const char* const *argv) {
+    MICRORL_UNUSED(msh);
+
     print("\033[2J");    /* ESC seq for clear entire screen */
     print("\033[H");     /* ESC seq for move cursor at left-top corner */
 
@@ -284,7 +288,9 @@ int clear_screen_cmd(int argc, const char* const *argv) {
  * \param[in]       argc: argument count
  * \param[in]       argv: pointer array to token string
  */
-int sernum_cmd(int argc, const char* const *argv) {
+int sernum_cmd(microsh_t* msh, int argc, const char* const *argv) {
+    MICRORL_UNUSED(msh);
+
     size_t i = 0;
 
     if (++i < argc) {
