@@ -36,6 +36,7 @@ extern "C" {
  * here settings you want to change values
  */
 #define MICROSH_CFG_NUM_OF_CMDS               3
+#define MICROSH_CFG_LOGGING_CMD_EXEC_RESULT   1
 
 #ifdef __cplusplus
 }

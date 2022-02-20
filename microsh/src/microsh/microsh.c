@@ -156,6 +156,7 @@ static int prv_execute(microrl_t* mrl, int argc, const char* const *argv) {
  * \param[in]       argv: Pointer to argument list
  */
 void post_exec_hook(microrl_t* mrl, int res, int argc, const char* const *argv) {
+#if MICROSH_CFG_LOGGING_CMD_EXEC_RESULT
     microsh_execr_t exec_res = (microsh_execr_t)res;
 
     if (exec_res > microshEXEC_ERROR) {
@@ -175,4 +176,5 @@ void post_exec_hook(microrl_t* mrl, int res, int argc, const char* const *argv) 
                 break;
         }
     }
+#endif /* MICROSH_CFG_LOGGING_CMD_EXEC_RESULT */
 }
