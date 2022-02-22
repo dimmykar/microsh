@@ -70,7 +70,8 @@ struct microsh;
  * \param[in]       msh: microSH instance
  * \param[in]       argc: Number of arguments
  * \param[in]       argv: Pointer to arguments
- * \return          `0` on success, `-1` otherwise
+ * \return          \ref microshEXEC_OK on success, member of
+ *                      \ref microsh_execr_t enumeration otherwise
  */
 typedef int      (*microsh_cmd_fn)(struct microsh* msh, int argc, const char* const *argv);
 
@@ -79,7 +80,7 @@ typedef int      (*microsh_cmd_fn)(struct microsh* msh, int argc, const char* co
  */
 typedef struct {
     const char* name;                           /*!< Command name to search for match */
-    size_t arg_num;                             /*!< Number of arguments */
+    size_t arg_num;                             /*!< Maximum number of arguments */
     const char* desc;                           /*!< Command description for help */
     microsh_cmd_fn cmd_fn;                      /*!< Command execute function to call */
 } microsh_cmd_t;

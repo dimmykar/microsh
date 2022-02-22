@@ -108,10 +108,10 @@ void init(void) {
 
 /**
  * \brief           Register all commands used by shell
+ * \param[in]       msh: \ref microsh_t working instance
  * \return          \ref microshOK on success, member of \ref microshr_t otherwise
  */
-microshr_t register_all_commands(microsh_t* msh)
-{
+microshr_t register_all_commands(microsh_t* msh) {
     microshr_t result = microshOK;
 
     result |= microsh_register_cmd(msh, 1, _CMD_HELP, help_cmd, NULL);
@@ -205,8 +205,6 @@ static void u32_to_str(uint32_t* val, char* str) {
 
 /**
  * \brief           SERNUM ? command callback
- * \param[in]       mrl: \ref microrl_t working instance
- * \param[in]       val: new serial number value
  */
 static void read_sernum(void) {
     char sn_str[11] = {0};
@@ -220,8 +218,7 @@ static void read_sernum(void) {
 
 /**
  * \brief           SERNUM VALUE command callback
- * \param[in]       mrl: \ref microrl_t working instance
- * \param[in]       val: new serial number value
+ * \param[in]       str_val: New serial number value
  */
 static void set_sernum(char* str_val) {
     uint32_t sn = 0;
@@ -241,7 +238,6 @@ static void set_sernum(char* str_val) {
 
 /**
  * \brief           SERNUM SAVE command callback
- * \param[in]       mrl: \ref microrl_t working instance
  */
 static void save_sernum(void) {
     /* To simplify the code, no implementation of writing SN to FLASH OTP memory is provided here */
@@ -250,6 +246,7 @@ static void save_sernum(void) {
 
 /**
  * \brief           HELP command execution
+ * \param[in]       msh: \ref microsh_t working instance
  * \param[in]       argc: argument count
  * \param[in]       argv: pointer array to token string
  */
@@ -271,6 +268,7 @@ int help_cmd(microsh_t* msh, int argc, const char* const *argv) {
 
 /**
  * \brief           CLEAR command execution
+ * \param[in]       msh: \ref microsh_t working instance
  * \param[in]       argc: argument count
  * \param[in]       argv: pointer array to token string
  */
@@ -285,6 +283,7 @@ int clear_screen_cmd(microsh_t* msh, int argc, const char* const *argv) {
 
 /**
  * \brief           SERNUM command execution
+ * \param[in]       msh: \ref microsh_t working instance
  * \param[in]       argc: argument count
  * \param[in]       argv: pointer array to token string
  */

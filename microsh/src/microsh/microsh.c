@@ -51,7 +51,7 @@ static int prv_execute(microrl_t* mrl, int argc, const char* const *argv);
 
 /**
  * \brief           Init and prepare Shell stack for operation
- * \note            Function must be called when mcu initializes.
+ * \note            Function must be called when MCU initializes.
  *
  * \param[in,out]   msh: microSH instance
  * \param[in]       out_fn: String output callback function for microrl
@@ -61,10 +61,12 @@ microshr_t microsh_init(microsh_t* msh, microrl_output_fn out_fn) {
     microshr_t res = microshOK;
 
     if (msh == NULL || out_fn == NULL) {
-        res = microshERRPAR;
-    } else {
-        memset(msh, 0x00, sizeof(microsh_t));
-        microrl_init(&msh->mrl, out_fn, prv_execute);
+        return microshERRPAR;
+    }
+
+    memset(msh, 0x00, sizeof(microsh_t));
+    if (microrl_init(&msh->mrl, out_fn, prv_execute) != microrlOK) {
+        res = microshERR;
     }
 
     return res;
@@ -72,6 +74,8 @@ microshr_t microsh_init(microsh_t* msh, microrl_output_fn out_fn) {
 
 /**
  * \brief           Register new command to shell
+ * \param[in,out]   msh: microSH instance
+ * \param[in]       arg_num: Maximum number of arguments including command token
  * \param[in]       cmd_name: Command name. This one is used when entering shell command
  * \param[in]       cmd_fn: Function to call on command match
  * \param[in]       desc: Custom command description
@@ -79,23 +83,24 @@ microshr_t microsh_init(microsh_t* msh, microrl_output_fn out_fn) {
  */
 microshr_t microsh_register_cmd(microsh_t* msh, size_t arg_num, const char* cmd_name,
                                     microsh_cmd_fn cmd_fn, const char* desc) {
-    if (cmd_name == NULL || cmd_fn == NULL
-        || strlen(cmd_name) == 0) {
+    if (msh == NULL || arg_num == 0 || cmd_name == NULL ||
+            cmd_fn == NULL || strlen(cmd_name) == 0) {
         return microshERRPAR;
     }
 
     /* Check for memory available */
-    if (msh->cmds_index < MICROSH_ARRAYSIZE(msh->cmds)) {
-        msh->cmds[msh->cmds_index].name = cmd_name;
-        msh->cmds[msh->cmds_index].arg_num = arg_num;
-        msh->cmds[msh->cmds_index].cmd_fn = cmd_fn;
-        msh->cmds[msh->cmds_index].desc = desc;
-
-        ++msh->cmds_index;
-        return microshOK;
+    if (msh->cmds_index > MICROSH_ARRAYSIZE(msh->cmds)) {
+        return microshERRMEM;
     }
 
-    return microshERRMEM;
+    msh->cmds[msh->cmds_index].name = cmd_name;
+    msh->cmds[msh->cmds_index].arg_num = arg_num;
+    msh->cmds[msh->cmds_index].cmd_fn = cmd_fn;
+    msh->cmds[msh->cmds_index].desc = desc;
+
+    ++msh->cmds_index;
+
+    return microshOK;
 }
 
 /**
@@ -103,7 +108,8 @@ microshr_t microsh_register_cmd(microsh_t* msh, size_t arg_num, const char* cmd_
  * \param[in]       mrl: \ref microrl_t working instance
  * \param[in]       argc: argument count
  * \param[in]       argv: pointer array to token string
- * \return          '0' on success, '1' otherwise
+ * \return          \ref microshEXEC_OK on success, member of
+ *                      \ref microsh_execr_t enumeration otherwise
  */
 static int prv_execute(microrl_t* mrl, int argc, const char* const *argv) {
     microsh_cmd_t* cmd = NULL;
