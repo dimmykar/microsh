@@ -104,6 +104,18 @@ microshr_t microsh_register_cmd(microsh_t* msh, size_t arg_num, const char* cmd_
 }
 
 /**
+ * \brief           Delete all registered commands
+ * \param[in,out]   msh: microSH instance
+ * \return          \ref microshOK on success, member of \ref microshr_t otherwise
+ */
+microshr_t microsh_unregister_all_cmd(microsh_t* msh) {
+    memset(msh->cmds, 0x00, sizeof(msh->cmds));
+    msh->cmds_index = 0;
+
+    return microshOK;
+}
+
+/**
  * \brief           Command execute callback general function
  * \param[in]       mrl: \ref microrl_t working instance
  * \param[in]       argc: argument count

@@ -107,6 +107,7 @@ typedef struct microsh {
 microshr_t    microsh_init(microsh_t* msh, microrl_output_fn out_fn);
 microshr_t    microsh_register_cmd(microsh_t* msh, size_t arg_num, const char* cmd_name,
                                        microsh_cmd_fn cmd_fn, const char* desc);
+microshr_t    microsh_unregister_all_cmd(microsh_t* msh);
 
 /**
  * \}
