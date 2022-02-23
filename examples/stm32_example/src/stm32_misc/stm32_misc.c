@@ -41,7 +41,7 @@
 #define USART_UART_ENABLE_CLOCK()   LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_USART2)
 #define USART_PERIFH                USART2
 
-#define _STM32_DEMO_VER             "0.1"
+#define _STM32_DEMO_VER             "1.0"
 
 #define _ENDLINE_SEQ                MICRORL_CFG_END_LINE
 
@@ -49,15 +49,17 @@
 #define _CMD_HELP                   "help"
 #define _CMD_CLEAR                  "clear"
 #define _CMD_SERNUM                 "sernum"
+#define _CMD_LOGOUT                 "logout"
+
 /* Arguments for set/clear */
 #define _SCMD_RD                    "?"
 #define _SCMD_SAVE                  "save"
 
-#define _NUM_OF_CMD                 3
+#define _NUM_OF_CMD                 4
 #define _NUM_OF_SETCLEAR_SCMD       2
 
 /* Available  commands */
-char* keyword[] = {_CMD_HELP, _CMD_CLEAR, _CMD_SERNUM};
+char* keyword[] = {_CMD_HELP, _CMD_CLEAR, _CMD_SERNUM, _CMD_LOGOUT};
 
 /* 'read/save' command argements */
 char* read_save_key[] = {_SCMD_RD, _SCMD_SAVE};
@@ -71,6 +73,7 @@ uint32_t device_sn = 0;
 static int help_cmd(microsh_t* msh, int argc, const char* const *argv);
 static int clear_screen_cmd(microsh_t* msh, int argc, const char* const *argv);
 static int sernum_cmd(microsh_t* msh, int argc, const char* const *argv);
+static int logout_cmd(microsh_t* msh, int argc, const char* const *argv);
 
 /**
  * \brief           Init STM32F4 platform
@@ -106,6 +109,14 @@ void init(void) {
     LL_USART_Enable(USART_PERIFH);
 }
 
+microshr_t register_auth_commands(microsh_t* msh) {
+    microshr_t result = microshOK;
+
+    result |= microsh_register_cmd(msh, 1, _CMD_HELP,   help_cmd,         NULL);
+
+    return result;
+}
+
 /**
  * \brief           Register all commands used by shell
  * \param[in]       msh: \ref microsh_t working instance
@@ -114,9 +125,10 @@ void init(void) {
 microshr_t register_all_commands(microsh_t* msh) {
     microshr_t result = microshOK;
 
-    result |= microsh_register_cmd(msh, 1, _CMD_HELP, help_cmd, NULL);
-    result |= microsh_register_cmd(msh, 1, _CMD_CLEAR, clear_screen_cmd, NULL);
-    result |= microsh_register_cmd(msh, 2, _CMD_SERNUM, sernum_cmd, NULL);
+    result |= microsh_register_cmd(msh, 1, _CMD_HELP,   help_cmd,         NULL);
+    result |= microsh_register_cmd(msh, 1, _CMD_CLEAR,  clear_screen_cmd, NULL);
+    result |= microsh_register_cmd(msh, 2, _CMD_SERNUM, sernum_cmd,       NULL);
+    result |= microsh_register_cmd(msh, 1, _CMD_LOGOUT, logout_cmd,       NULL);
 
     return result;
 }
@@ -249,6 +261,8 @@ static void save_sernum(void) {
  * \param[in]       msh: \ref microsh_t working instance
  * \param[in]       argc: argument count
  * \param[in]       argv: pointer array to token string
+ * \return          \ref microshEXEC_OK on success, member of
+ *                      \ref microsh_execr_t enumeration otherwise
  */
 int help_cmd(microsh_t* msh, int argc, const char* const *argv) {
     MICRORL_UNUSED(msh);
@@ -257,11 +271,19 @@ int help_cmd(microsh_t* msh, int argc, const char* const *argv) {
     print(_STM32_DEMO_VER);
     print(_ENDLINE_SEQ);
 
-    print("Use TAB key for completion"_ENDLINE_SEQ"List of commands:"_ENDLINE_SEQ);
-    print("\tclear               - clear screen"_ENDLINE_SEQ);
-    print("\tsernum ?            - read serial number value"_ENDLINE_SEQ);
-    print("\tsernum VALUE        - set serial number value"_ENDLINE_SEQ);
-    print("\tsernum save         - save serial number value to flash"_ENDLINE_SEQ);
+    print("Use TAB key for completion"_ENDLINE_SEQ);
+    if (!msh->session.status.flags.logged_in) {
+        print(_ENDLINE_SEQ"You must log in to one of the sessions."_ENDLINE_SEQ);
+        print("After authorization, session commands will be available."_ENDLINE_SEQ);
+        print("Different commands may be available for different sessions."_ENDLINE_SEQ);
+    } else {
+        print("List of commands:"_ENDLINE_SEQ);
+        print("\tclear               - clear screen"_ENDLINE_SEQ);
+        print("\tsernum ?            - read serial number value"_ENDLINE_SEQ);
+        print("\tsernum VALUE        - set serial number value"_ENDLINE_SEQ);
+        print("\tsernum save         - save serial number value to flash"_ENDLINE_SEQ);
+        print("\tlogout              - end an authorized session"_ENDLINE_SEQ);
+    }
 
     return microshEXEC_OK;
 }
@@ -271,6 +293,8 @@ int help_cmd(microsh_t* msh, int argc, const char* const *argv) {
  * \param[in]       msh: \ref microsh_t working instance
  * \param[in]       argc: argument count
  * \param[in]       argv: pointer array to token string
+ * \return          \ref microshEXEC_OK on success, member of
+ *                      \ref microsh_execr_t enumeration otherwise
  */
 int clear_screen_cmd(microsh_t* msh, int argc, const char* const *argv) {
     MICRORL_UNUSED(msh);
@@ -286,6 +310,8 @@ int clear_screen_cmd(microsh_t* msh, int argc, const char* const *argv) {
  * \param[in]       msh: \ref microsh_t working instance
  * \param[in]       argc: argument count
  * \param[in]       argv: pointer array to token string
+ * \return          \ref microshEXEC_OK on success, member of
+ *                      \ref microsh_execr_t enumeration otherwise
  */
 int sernum_cmd(microsh_t* msh, int argc, const char* const *argv) {
     MICRORL_UNUSED(msh);
@@ -304,6 +330,22 @@ int sernum_cmd(microsh_t* msh, int argc, const char* const *argv) {
         print("Read or specify serial number"_ENDLINE_SEQ);
         return microshEXEC_ERROR;
     }
+
+    return microshEXEC_OK;
+}
+
+/**
+ * \brief           LOGOUT command execution
+ * \param[in]       msh: \ref microsh_t working instance
+ * \param[in]       argc: argument count
+ * \param[in]       argv: pointer array to token string
+ * \return          \ref microshEXEC_OK on success, member of
+ *                      \ref microsh_execr_t enumeration otherwise
+ */
+int logout_cmd(microsh_t* msh, int argc, const char* const *argv) {
+    microsh_session_logout(msh);
+    microsh_unregister_all_cmd(msh);
+    print("Logged out"_ENDLINE_SEQ);
 
     return microshEXEC_OK;
 }

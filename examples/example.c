@@ -31,20 +31,41 @@
 #include "example_misc.h"
 
 /* Create microsh instance */
-microsh_t sh;
+static microsh_t sh;
+
+/* Console sessions credentials for authorization process */
+static microsh_credentials_t credentials[2] = {
+    { .login_type = _LOGIN_TYPE_DEBUG, .username = "debug", .password = "54321" },
+    { .login_type = _LOGIN_TYPE_ADMIN, .username = "admin", .password = "12345" }
+};
+
+static void log_in_callback(microsh_t* msh);
 
 /**
  * \brief           Program entry point
  */
 int main (void/*int argc, char** argv*/) {
     static microsh_t* psh = &sh;
+    microshr_t cmd_reg_res = microshOK;
 
     /* Hardware initialization */
     init();
 
     /* Initialize library with microsh instance and print callback placed in microrl instance */
     microsh_init(psh, microrl_print);
-    if (register_all_commands(psh) != microshOK) {
+
+#if MICROSH_CFG_CONSOLE_SESSIONS
+    /* Initialize sessions credentials */
+    microsh_session_init(&sh, credentials, MICROSH_ARRAYSIZE(credentials), log_in_callback);
+
+    /* Registering additional commands for the authorization process (optional) */
+    cmd_reg_res = register_auth_commands(psh);
+#else
+    /* Registering shell commands */
+    cmd_reg_res = register_all_commands(psh);
+#endif /* MICROSH_CFG_CONSOLE_SESSIONS */
+
+    if (cmd_reg_res != microshOK) {
         microrl_print(&psh->mrl, "No memory to register all commands!"MICRORL_CFG_END_LINE);
     }
 
@@ -59,10 +80,30 @@ int main (void/*int argc, char** argv*/) {
 #endif /* MICRORL_CFG_USE_CTRL_C */
 
     while (1) {
+        if (sh.cmds[0].arg_num == 0) {
+            if (!sh.session.status.flags.logged_in) {
+                cmd_reg_res = register_auth_commands(psh);
+            } else {
+                cmd_reg_res = register_all_commands(psh);
+            }
+
+            if (cmd_reg_res != microshOK) {
+                microrl_print(&psh->mrl, "No memory to register all commands!"MICRORL_CFG_END_LINE);
+            }
+        }
+
         /* Put received char from stdin to microrl instance */
         char ch = get_char();
         microrl_processing_input(&psh->mrl, &ch, 1);
     }
 
     return 0;
+}
+
+/**
+ * \brief           Post log in callback. Clears auth commands
+ * \param[in]       msh: microSH instance
+ */
+static void log_in_callback(microsh_t* msh) {
+    microsh_unregister_all_cmd(msh);
 }

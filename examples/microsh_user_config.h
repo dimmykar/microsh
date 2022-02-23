@@ -35,8 +35,12 @@ extern "C" {
  * Open "microsh_config.h" and copy & replace
  * here settings you want to change values
  */
-#define MICROSH_CFG_NUM_OF_CMDS               3
+#define MICROSH_CFG_NUM_OF_CMDS               4
 #define MICROSH_CFG_LOGGING_CMD_EXEC_RESULT   1
+
+#define MICROSH_CFG_CONSOLE_SESSIONS          1
+#define MICROSH_CFG_MAX_CREDENTIALS           2
+#define MICROSH_CFG_MAX_AUTH_ATTEMPTS         3
 
 #ifdef __cplusplus
 }

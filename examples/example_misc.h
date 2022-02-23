@@ -32,7 +32,18 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#if MICROSH_CFG_CONSOLE_SESSIONS
+enum {
+    /* Login type 0x00 reserved by library as _LOGIN_TYPE_LOGGED_OUT type */
+    _LOGIN_TYPE_DEBUG = 0x01,
+    _LOGIN_TYPE_ADMIN
+};
+#endif /* MICROSH_CFG_CONSOLE_SESSIONS */
+
 void       init(void);
+#if MICROSH_CFG_CONSOLE_SESSIONS
+microshr_t register_auth_commands(microsh_t* msh);
+#endif /* MICROSH_CFG_CONSOLE_SESSIONS */
 microshr_t register_all_commands(microsh_t* msh);
 int        microrl_print(microrl_t* mrl, const char* str);
 char       get_char(void);
