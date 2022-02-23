@@ -76,6 +76,12 @@ struct microsh;
 typedef int      (*microsh_cmd_fn)(struct microsh* msh, int argc, const char* const *argv);
 
 /**
+ * \brief           Optional successful log in callback
+ * \param[in]       msh: microSH instance
+ */
+typedef void     (*microsh_logged_in_fn)(struct microsh* msh);
+
+/**
  * \brief           Shell command structure
  */
 typedef struct {
@@ -95,6 +101,39 @@ typedef enum {
     microshERRMEM = 0x03,                        /*!< Memory error */
 } microshr_t;
 
+#if MICROSH_CFG_CONSOLE_SESSIONS
+/**
+ * \brief           Console session credentials
+ */
+typedef struct {
+    uint32_t login_type;                         /*!< Type of user-defined console session. `0` is used as LOGGED_OUT type in library! */
+    char* username;                              /*!< Username of login type */
+    char* password;                              /*!< Password of login type */
+} microsh_credentials_t;
+
+/**
+ * \brief           Сurrent console session status
+ */
+typedef struct {
+    uint32_t login_type;                         /*!< Type of user-defined console session. `0` is used as LOGGED_OUT type in library! */
+    size_t attempt;                              /*!< Password enter attempts counter */
+    struct flags {
+        uint8_t logged_in    : 1;                /*!< User logged into session */
+        uint8_t passw_wait   : 1;                /*!< User exists and is allowed to enter password */
+        uint8_t reserved     : 6;
+    } flags;
+} microsh_session_status_t;
+
+/**
+ * \brief           Console session context
+ */
+typedef struct {
+    microsh_credentials_t credentials[MICROSH_CFG_MAX_CREDENTIALS];/*!< All available sessions credentials */
+    microsh_session_status_t status;             /*!< Сurrent console session status */
+    microsh_logged_in_fn logged_in_fn;           /*!< Successful log in callback */
+} microsh_session_t;
+#endif /* MICROSH_CFG_CONSOLE_SESSIONS */
+
 /**
  * \brief           MicroSH instance
  */
@@ -102,12 +141,21 @@ typedef struct microsh {
     microrl_t mrl;                               /*!< MicroRL context instance */
     microsh_cmd_t cmds[MICROSH_CFG_NUM_OF_CMDS]; /*!< Array of all registered commands */
     size_t cmds_index;                           /*!< Registered command index counter */
+#if MICROSH_CFG_CONSOLE_SESSIONS
+    microsh_session_t session;                   /*!< Console session context instance */
+#endif /* MICROSH_CFG_CONSOLE_SESSIONS */
 } microsh_t;
 
 microshr_t    microsh_init(microsh_t* msh, microrl_output_fn out_fn);
 microshr_t    microsh_register_cmd(microsh_t* msh, size_t arg_num, const char* cmd_name,
                                        microsh_cmd_fn cmd_fn, const char* desc);
 microshr_t    microsh_unregister_all_cmd(microsh_t* msh);
+
+#if MICROSH_CFG_CONSOLE_SESSIONS
+microshr_t    microsh_session_init(microsh_t* msh, const microsh_credentials_t* cred, size_t cred_num,
+                                       microsh_logged_in_fn logged_in_cb);
+microshr_t    microsh_session_logout(microsh_t* msh);
+#endif /* MICROSH_CFG_CONSOLE_SESSIONS */
 
 /**
  * \}

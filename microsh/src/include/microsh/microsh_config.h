@@ -59,6 +59,28 @@ extern "C" {
 #define MICROSH_CFG_LOGGING_CMD_EXEC_RESULT   1
 #endif
 
+
+/**
+ * \brief           Enable console sessions with authentication process
+ */
+#ifndef MICROSH_CFG_CONSOLE_SESSIONS
+#define MICROSH_CFG_CONSOLE_SESSIONS          0
+#endif
+
+/**
+ * \brief           Maximum number of sessions credentials
+ */
+#ifndef MICROSH_CFG_MAX_CREDENTIALS
+#define MICROSH_CFG_MAX_CREDENTIALS           5
+#endif
+
+/**
+ * \brief           Number of attempts to enter the session password
+ */
+#ifndef MICROSH_CFG_MAX_AUTH_ATTEMPTS
+#define MICROSH_CFG_MAX_AUTH_ATTEMPTS         3
+#endif
+
 /**
  * \}
  */

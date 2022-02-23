@@ -47,7 +47,12 @@
 #include <string.h>
 #include "microsh.h"
 
-static int prv_execute(microrl_t* mrl, int argc, const char* const *argv);
+#if MICROSH_CFG_CONSOLE_SESSIONS
+static int     prv_execute_login(microrl_t* mrl, int argc, const char* const *argv);
+static void    prv_clean_array(void *arr, size_t n);
+#endif /* MICROSH_CFG_CONSOLE_SESSIONS */
+
+static int     prv_execute(microrl_t* mrl, int argc, const char* const *argv);
 
 /**
  * \brief           Init and prepare Shell stack for operation
@@ -114,6 +119,142 @@ microshr_t microsh_unregister_all_cmd(microsh_t* msh) {
 
     return microshOK;
 }
+
+#if MICROSH_CFG_CONSOLE_SESSIONS
+/**
+ * \brief           Console sessions initialization
+ * \note            Call this function right after microsh_init()
+ * \param[in,out]   msh: microSH instance
+ * \param[in]       cred: Pointer to array with sessions credentials
+ * \param[in]       cred_num: Size of array with sessions credentials
+ * \param[in]       logged_in_cb: Optional successful log in callback
+ * \return          \ref microshOK on success, member of \ref microshr_t otherwise
+ */
+microshr_t microsh_session_init(microsh_t* msh, const microsh_credentials_t* cred, size_t cred_num,
+                                    microsh_logged_in_fn logged_in_cb) {
+    if (cred == NULL || cred_num > MICROSH_CFG_MAX_CREDENTIALS) {
+        return microshERRPAR;
+    }
+
+    memcpy(msh->session.credentials, cred, cred_num * sizeof(microsh_credentials_t));
+    msh->session.logged_in_fn = logged_in_cb;
+    microsh_session_logout(msh);
+
+    return microshOK;
+}
+
+/**
+ * \brief           This function switches shell to session authentication process
+ * \param[in,out]   msh: microSH instance
+ * \return          \ref microshOK on success, member of \ref microshr_t otherwise
+ */
+microshr_t microsh_session_logout(microsh_t* msh) {
+    msh->session.status.login_type = 0;
+    msh->session.status.attempt = MICROSH_CFG_MAX_AUTH_ATTEMPTS;
+    msh->session.status.flags.logged_in = 0;
+    msh->session.status.flags.passw_wait = 0;
+    microrl_set_execute_callback(&msh->mrl, prv_execute_login);
+
+    return microshOK;
+}
+
+/**
+ * \brief           Session authentication process execute callback
+ * \param[in]       mrl: \ref microrl_t working instance
+ * \param[in]       argc: argument count
+ * \param[in]       argv: pointer array to token string
+ * \return          \ref microshEXEC_OK on success, member of
+ *                      \ref microsh_execr_t enumeration otherwise
+ */
+static int prv_execute_login(microrl_t* mrl, int argc, const char* const *argv) {
+    microsh_t* msh = (microsh_t*)mrl;
+
+    /* Check for empty command buffer */
+    if (argc == 0) {
+        return microshEXEC_NO_CMD;
+    }
+
+    uint8_t i = 0;
+
+    while (i < argc) {
+        if (strcmp(argv[i], "login") == 0) {
+            if (!(++i < argc)) {
+                mrl->out_fn(mrl, "Enter your username after 'login' command"MICRORL_CFG_END_LINE);
+                return microshEXEC_ERROR;
+            }
+
+            for (size_t j = 0; j < MICROSH_ARRAYSIZE(msh->session.credentials); ++j) {
+                if (strcmp(argv[i], msh->session.credentials[j].username) == 0) {
+                    microrl_set_echo(&msh->mrl, MICRORL_ECHO_ONCE);
+                    msh->session.status.login_type = msh->session.credentials[j].login_type;
+                    msh->session.status.flags.passw_wait = 1;
+                    prv_clean_array((void*)argv[i], strlen(argv[i]));
+
+                    mrl->out_fn(mrl, "Enter the password:"MICRORL_CFG_END_LINE);
+                    return microshEXEC_OK;
+                }
+            }
+
+            prv_clean_array((void*)argv[i], strlen(argv[i]));
+            mrl->out_fn(mrl, "Wrong username! Try again"MICRORL_CFG_END_LINE);
+            return microshEXEC_ERROR;
+        } else if (msh->session.status.flags.passw_wait) {
+            size_t j;
+            for (j = 0; j < MICROSH_ARRAYSIZE(msh->session.credentials); ++j) {
+               if (msh->session.status.login_type == msh->session.credentials[j].login_type) {
+                   break;
+               }
+            }
+
+            if (strcmp(argv[i], msh->session.credentials[j].password) == 0) {
+                msh->session.status.flags.passw_wait = 0;
+                msh->session.status.flags.logged_in = 1;
+                prv_clean_array((void*)argv[i], strlen(argv[i]));
+                microrl_set_execute_callback(mrl, prv_execute);
+                mrl->out_fn(mrl, "Logged In!"MICRORL_CFG_END_LINE);
+
+                /* Call post log in callback if exist */
+                if (msh->session.logged_in_fn != NULL) {
+                    msh->session.logged_in_fn(msh);
+                }
+
+                return microshEXEC_OK;
+            }
+
+            msh->session.status.login_type = 0;
+            msh->session.status.flags.passw_wait = 0;
+            prv_clean_array((void*)argv[i], strlen(argv[i]));
+
+            mrl->out_fn(mrl, "Wrong password! Try to Log in again"MICRORL_CFG_END_LINE);
+            return microshEXEC_ERROR;
+        } else {
+            /* Try to execute registered logged out commands */
+            if (prv_execute(mrl, argc, argv) != microshEXEC_OK) {
+                /* There are no such registered logged out commands */
+                mrl->out_fn(mrl, "You need to Log In! Type 'login YOUR_USERNAME'"MICRORL_CFG_END_LINE);
+                return microshEXEC_ERROR;
+            }
+        }
+        ++i;
+    }
+
+    return microshEXEC_OK;
+}
+
+/**
+ * \brief           Safe array cleanup. Unlike memset() this function
+ *                      is not removed by compiler optimizations
+ * \param[out]      arr: Array with data to clear
+ * \param[in]       n: Array length
+ */
+static void prv_clean_array(void *arr, size_t n)
+{
+    uint8_t* p = (uint8_t*)arr;
+    while (n--) {
+        *p++ = 0x00;
+    }
+}
+#endif /* MICROSH_CFG_CONSOLE_SESSIONS */
 
 /**
  * \brief           Command execute callback general function
