@@ -185,7 +185,7 @@ static int prv_execute_login(microrl_t* mrl, int argc, const char* const *argv) 
 
             for (size_t j = 0; j < MICROSH_ARRAYSIZE(msh->session.credentials); ++j) {
                 if (strcmp(argv[i], msh->session.credentials[j].username) == 0) {
-                    microrl_set_echo(&msh->mrl, MICRORL_ECHO_ONCE);
+                    microrl_set_echo(&msh->mrl, MICRORL_ECHO_OFF);
                     msh->session.status.login_type = msh->session.credentials[j].login_type;
                     msh->session.status.flags.passw_wait = 1;
                     prv_clean_array((void*)argv[i], strlen(argv[i]));
@@ -210,6 +210,7 @@ static int prv_execute_login(microrl_t* mrl, int argc, const char* const *argv) 
                 msh->session.status.flags.passw_wait = 0;
                 msh->session.status.flags.logged_in = 1;
                 prv_clean_array((void*)argv[i], strlen(argv[i]));
+                microrl_set_echo(&msh->mrl, MICRORL_ECHO_ON);
                 microrl_set_execute_callback(mrl, prv_execute);
                 mrl->out_fn(mrl, "Logged In!"MICRORL_CFG_END_LINE);
 
@@ -221,11 +222,17 @@ static int prv_execute_login(microrl_t* mrl, int argc, const char* const *argv) 
                 return microshEXEC_OK;
             }
 
-            msh->session.status.login_type = 0;
-            msh->session.status.flags.passw_wait = 0;
+            mrl->out_fn(mrl, "Wrong password! ");
+            if (--msh->session.status.attempt == 0) {
+                mrl->out_fn(mrl, "Try to Log in again"MICRORL_CFG_END_LINE);
+                msh->session.status.login_type = 0;
+                msh->session.status.flags.passw_wait = 0;
+                msh->session.status.attempt = MICROSH_CFG_MAX_AUTH_ATTEMPTS;
+                microrl_set_echo(&msh->mrl, MICRORL_ECHO_ON);
+            } else {
+                mrl->out_fn(mrl, "Try again"MICRORL_CFG_END_LINE);
+            }
             prv_clean_array((void*)argv[i], strlen(argv[i]));
-
-            mrl->out_fn(mrl, "Wrong password! Try to Log in again"MICRORL_CFG_END_LINE);
             return microshEXEC_ERROR;
         } else {
             /* Try to execute registered logged out commands */
