@@ -73,7 +73,9 @@ uint32_t device_sn = 0;
 static int help_cmd(microsh_t* msh, int argc, const char* const *argv);
 static int clear_screen_cmd(microsh_t* msh, int argc, const char* const *argv);
 static int sernum_cmd(microsh_t* msh, int argc, const char* const *argv);
+#if MICROSH_CFG_CONSOLE_SESSIONS
 static int logout_cmd(microsh_t* msh, int argc, const char* const *argv);
+#endif /* MICROSH_CFG_CONSOLE_SESSIONS */
 
 /**
  * \brief           Init STM32F4 platform
@@ -108,7 +110,12 @@ void init(void) {
 
     LL_USART_Enable(USART_PERIFH);
 }
-
+#if MICROSH_CFG_CONSOLE_SESSIONS
+/**
+ * \brief           Register commands that may be used in authorization process
+ * \param[in]       msh: \ref microsh_t working instance
+ * \return          \ref microshOK on success, member of \ref microshr_t otherwise
+ */
 microshr_t register_auth_commands(microsh_t* msh) {
     microshr_t result = microshOK;
 
@@ -116,6 +123,7 @@ microshr_t register_auth_commands(microsh_t* msh) {
 
     return result;
 }
+#endif /* MICROSH_CFG_CONSOLE_SESSIONS */
 
 /**
  * \brief           Register all commands used by shell
@@ -128,7 +136,9 @@ microshr_t register_all_commands(microsh_t* msh) {
     result |= microsh_register_cmd(msh, 1, _CMD_HELP,   help_cmd,         NULL);
     result |= microsh_register_cmd(msh, 1, _CMD_CLEAR,  clear_screen_cmd, NULL);
     result |= microsh_register_cmd(msh, 2, _CMD_SERNUM, sernum_cmd,       NULL);
+#if MICROSH_CFG_CONSOLE_SESSIONS
     result |= microsh_register_cmd(msh, 1, _CMD_LOGOUT, logout_cmd,       NULL);
+#endif /* MICROSH_CFG_CONSOLE_SESSIONS */
 
     return result;
 }
@@ -202,14 +212,14 @@ static void u32_to_str(uint32_t* val, char* str) {
     for (n = 0; v > 0; v /= 10) {
         str[s + n++] = "0123456789"[v % 10];
     }
-    
+
     /* Reverse a string */
     for (size_t i = 0; i < n / 2; ++i) {
         t = str[s + i];
         str[s + i] = str[s + n - i - 1];
         str[s + n - i - 1] = t;
     }
-    
+
     if (val == NULL) {
         str[n++] = '0';  /* Handle special case */
     }
@@ -222,7 +232,7 @@ static void read_sernum(void) {
     char sn_str[11] = {0};
     uint32_t sn = device_sn;
     u32_to_str(&sn, sn_str);
-    
+
     print("\tS/N ");
     print(sn_str);
     print(_ENDLINE_SEQ);
@@ -234,7 +244,7 @@ static void read_sernum(void) {
  */
 static void set_sernum(char* str_val) {
     uint32_t sn = 0;
-    
+
     str_to_u32(str_val, &sn);
     if (sn != 0) {
         device_sn = sn;
@@ -244,7 +254,7 @@ static void set_sernum(char* str_val) {
         print(_ENDLINE_SEQ);
         return;
     }
-    
+
     print("\tS/N not set"_ENDLINE_SEQ);
 }
 
@@ -272,18 +282,22 @@ int help_cmd(microsh_t* msh, int argc, const char* const *argv) {
     print(_ENDLINE_SEQ);
 
     print("Use TAB key for completion"_ENDLINE_SEQ);
+#if MICROSH_CFG_CONSOLE_SESSIONS
     if (!msh->session.status.flags.logged_in) {
         print(_ENDLINE_SEQ"You must log in to one of the sessions."_ENDLINE_SEQ);
         print("After authorization, session commands will be available."_ENDLINE_SEQ);
         print("Different commands may be available for different sessions."_ENDLINE_SEQ);
     } else {
+#endif /* MICROSH_CFG_CONSOLE_SESSIONS */
         print("List of commands:"_ENDLINE_SEQ);
         print("\tclear               - clear screen"_ENDLINE_SEQ);
         print("\tsernum ?            - read serial number value"_ENDLINE_SEQ);
         print("\tsernum VALUE        - set serial number value"_ENDLINE_SEQ);
         print("\tsernum save         - save serial number value to flash"_ENDLINE_SEQ);
         print("\tlogout              - end an authorized session"_ENDLINE_SEQ);
+#if MICROSH_CFG_CONSOLE_SESSIONS
     }
+#endif /* MICROSH_CFG_CONSOLE_SESSIONS */
 
     return microshEXEC_OK;
 }
@@ -334,6 +348,7 @@ int sernum_cmd(microsh_t* msh, int argc, const char* const *argv) {
     return microshEXEC_OK;
 }
 
+#if MICROSH_CFG_CONSOLE_SESSIONS
 /**
  * \brief           LOGOUT command execution
  * \param[in]       msh: \ref microsh_t working instance
@@ -349,6 +364,7 @@ int logout_cmd(microsh_t* msh, int argc, const char* const *argv) {
 
     return microshEXEC_OK;
 }
+#endif /* MICROSH_CFG_CONSOLE_SESSIONS */
 
 #if MICRORL_CFG_USE_COMPLETE || __DOXYGEN__
 /**

@@ -33,6 +33,7 @@
 /* Create microsh instance */
 static microsh_t sh;
 
+#if MICROSH_CFG_CONSOLE_SESSIONS
 /* Console sessions credentials for authorization process */
 static microsh_credentials_t credentials[2] = {
     { .login_type = _LOGIN_TYPE_DEBUG, .username = "debug", .password = "54321" },
@@ -40,6 +41,7 @@ static microsh_credentials_t credentials[2] = {
 };
 
 static void log_in_callback(microsh_t* msh);
+#endif /* MICROSH_CFG_CONSOLE_SESSIONS */
 
 /**
  * \brief           Program entry point
@@ -80,6 +82,7 @@ int main (void/*int argc, char** argv*/) {
 #endif /* MICRORL_CFG_USE_CTRL_C */
 
     while (1) {
+#if MICROSH_CFG_CONSOLE_SESSIONS
         if (sh.cmds[0].arg_num == 0) {
             if (!sh.session.status.flags.logged_in) {
                 cmd_reg_res = register_auth_commands(psh);
@@ -91,6 +94,7 @@ int main (void/*int argc, char** argv*/) {
                 microrl_print(&psh->mrl, "No memory to register all commands!"MICRORL_CFG_END_LINE);
             }
         }
+#endif /* MICROSH_CFG_CONSOLE_SESSIONS */
 
         /* Put received char from stdin to microrl instance */
         char ch = get_char();
@@ -100,6 +104,7 @@ int main (void/*int argc, char** argv*/) {
     return 0;
 }
 
+#if MICROSH_CFG_CONSOLE_SESSIONS
 /**
  * \brief           Post log in callback. Clears auth commands
  * \param[in]       msh: microSH instance
@@ -107,3 +112,4 @@ int main (void/*int argc, char** argv*/) {
 static void log_in_callback(microsh_t* msh) {
     microsh_unregister_all_cmd(msh);
 }
+#endif /* MICROSH_CFG_CONSOLE_SESSIONS */
