@@ -11,6 +11,8 @@ MicroSH is platform independent command line shell for embedded systems, based o
       * Turn on/off feature for add functional/decrease memory via `microsh_config.h` and `microsh_user_config.h` config files
   - No dynamic allocation
       * Maximum number of commands is assigned in configuration file
+  - Console sessions feature (optional)
+      * Use a shell in multi-user mode with a different set of commands 
   - Permissive Apache 2.0 license
 
 ## Getting started
