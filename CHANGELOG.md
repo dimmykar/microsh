@@ -5,6 +5,15 @@
 
 
 
+## v1.1.0
+
+1.  Change names for command-related APIs
+    - There is a mistake in the accepted naming of command-related APIs. This breaks backwards compatibility, making it wrong to make these changes in a minor update. However, due to the unpopularity of the library, one can take such liberties
+2.  Add new useful APIs
+    - Add command find API `microsh_cmd_find()`. Using this API you can find by command name the registered command entry
+    - Add logged in check API `microsh_session_is_logged_in()`. Using this API you can check current session status: logged in or logged out.
+    - Add get current session login type API `microsh_session_get_login_type()`. Using this API you can get user-defined session login type to find out which username you are authorized
+
 ## v1.0.0
 
 First release
