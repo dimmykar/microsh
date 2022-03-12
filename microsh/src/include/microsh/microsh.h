@@ -157,6 +157,7 @@ microsh_cmd_t* microsh_cmd_find(microsh_t* msh, const char* cmd_name);
 microshr_t     microsh_session_init(microsh_t* msh, const microsh_credentials_t* cred, size_t cred_num,
                                         microsh_logged_in_fn logged_in_cb);
 uint8_t        microsh_session_is_logged_in(microsh_t* msh);
+uint32_t       microsh_session_get_login_type(microsh_t* msh);
 microshr_t     microsh_session_logout(microsh_t* msh);
 #endif /* MICROSH_CFG_CONSOLE_SESSIONS */
 

@@ -185,6 +185,19 @@ uint8_t microsh_session_is_logged_in(microsh_t* msh) {
 }
 
 /**
+ * \brief           Get current console session login type
+ * \param[in,out]   msh: microSH instance
+ * \return          '0' if logged out, user-defined login type index otherwise
+ */
+uint32_t microsh_session_get_login_type(microsh_t* msh) {
+    if (msh == NULL) {
+        return 0;
+    }
+
+    return msh->session.status.login_type;
+}
+
+/**
  * \brief           This function switches shell to session authentication process
  * \param[in,out]   msh: microSH instance
  * \return          \ref microshOK on success, member of \ref microshr_t otherwise
