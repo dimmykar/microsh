@@ -124,6 +124,30 @@ microshr_t microsh_cmd_unregister_all(microsh_t* msh) {
     return microshOK;
 }
 
+/**
+ * \brief           Find command instance using command name
+ * \param[in]       msh: microSH instance
+ * \param[in]       cmd_name: Command name string
+ * \return          Pointer to \ref microsh_cmd_t command instance,
+ *                      'NULL' if command not registered
+ */
+microsh_cmd_t* microsh_cmd_find(microsh_t* msh, const char* cmd_name) {
+    if (msh == NULL || cmd_name == NULL || strlen(cmd_name) == 0 ||
+            msh->cmds_index == 0) {
+        return NULL;
+    }
+
+    microsh_cmd_t* cmd = NULL;
+    for (size_t i = 0; i < msh->cmds_index; ++i) {
+        if (strcmp(msh->cmds[i].name, cmd_name) == 0) {
+            cmd = &msh->cmds[i];
+            break;
+        }
+    }
+
+    return cmd;
+}
+
 #if MICROSH_CFG_CONSOLE_SESSIONS
 /**
  * \brief           Console sessions initialization
