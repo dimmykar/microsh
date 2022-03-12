@@ -172,6 +172,19 @@ microshr_t microsh_session_init(microsh_t* msh, const microsh_credentials_t* cre
 }
 
 /**
+ * \brief           Check session status
+ * \param[in,out]   msh: microSH instance
+ * \return          '1' if logged in session, '0' otherwise
+ */
+uint8_t microsh_session_is_logged_in(microsh_t* msh) {
+    if (msh == NULL) {
+        return 0;
+    }
+
+    return msh->session.status.flags.logged_in == 1 ? 1 : 0;
+}
+
+/**
  * \brief           This function switches shell to session authentication process
  * \param[in,out]   msh: microSH instance
  * \return          \ref microshOK on success, member of \ref microshr_t otherwise
