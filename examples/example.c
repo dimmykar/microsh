@@ -110,6 +110,6 @@ int main (void/*int argc, char** argv*/) {
  * \param[in]       msh: microSH instance
  */
 static void log_in_callback(microsh_t* msh) {
-    microsh_unregister_all_cmd(msh);
+    microsh_cmd_unregister_all(msh);
 }
 #endif /* MICROSH_CFG_CONSOLE_SESSIONS */

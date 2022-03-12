@@ -147,9 +147,9 @@ typedef struct microsh {
 } microsh_t;
 
 microshr_t    microsh_init(microsh_t* msh, microrl_output_fn out_fn);
-microshr_t    microsh_register_cmd(microsh_t* msh, size_t arg_num, const char* cmd_name,
+microshr_t    microsh_cmd_register(microsh_t* msh, size_t arg_num, const char* cmd_name,
                                        microsh_cmd_fn cmd_fn, const char* desc);
-microshr_t    microsh_unregister_all_cmd(microsh_t* msh);
+microshr_t    microsh_cmd_unregister_all(microsh_t* msh);
 
 #if MICROSH_CFG_CONSOLE_SESSIONS
 microshr_t    microsh_session_init(microsh_t* msh, const microsh_credentials_t* cred, size_t cred_num,

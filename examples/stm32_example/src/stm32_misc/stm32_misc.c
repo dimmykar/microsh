@@ -119,7 +119,7 @@ void init(void) {
 microshr_t register_auth_commands(microsh_t* msh) {
     microshr_t result = microshOK;
 
-    result |= microsh_register_cmd(msh, 1, _CMD_HELP,   help_cmd,         NULL);
+    result |= microsh_cmd_register(msh, 1, _CMD_HELP,   help_cmd,         NULL);
 
     return result;
 }
@@ -133,11 +133,11 @@ microshr_t register_auth_commands(microsh_t* msh) {
 microshr_t register_all_commands(microsh_t* msh) {
     microshr_t result = microshOK;
 
-    result |= microsh_register_cmd(msh, 1, _CMD_HELP,   help_cmd,         NULL);
-    result |= microsh_register_cmd(msh, 1, _CMD_CLEAR,  clear_screen_cmd, NULL);
-    result |= microsh_register_cmd(msh, 2, _CMD_SERNUM, sernum_cmd,       NULL);
+    result |= microsh_cmd_register(msh, 1, _CMD_HELP,   help_cmd,         NULL);
+    result |= microsh_cmd_register(msh, 1, _CMD_CLEAR,  clear_screen_cmd, NULL);
+    result |= microsh_cmd_register(msh, 2, _CMD_SERNUM, sernum_cmd,       NULL);
 #if MICROSH_CFG_CONSOLE_SESSIONS
-    result |= microsh_register_cmd(msh, 1, _CMD_LOGOUT, logout_cmd,       NULL);
+    result |= microsh_cmd_register(msh, 1, _CMD_LOGOUT, logout_cmd,       NULL);
 #endif /* MICROSH_CFG_CONSOLE_SESSIONS */
 
     return result;
@@ -359,7 +359,7 @@ int sernum_cmd(microsh_t* msh, int argc, const char* const *argv) {
  */
 int logout_cmd(microsh_t* msh, int argc, const char* const *argv) {
     microsh_session_logout(msh);
-    microsh_unregister_all_cmd(msh);
+    microsh_cmd_unregister_all(msh);
     print("Logged out"_ENDLINE_SEQ);
 
     return microshEXEC_OK;

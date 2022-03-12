@@ -86,7 +86,7 @@ microshr_t microsh_init(microsh_t* msh, microrl_output_fn out_fn) {
  * \param[in]       desc: Custom command description
  * \return          \ref microshOK on success, member of \ref microshr_t otherwise
  */
-microshr_t microsh_register_cmd(microsh_t* msh, size_t arg_num, const char* cmd_name,
+microshr_t microsh_cmd_register(microsh_t* msh, size_t arg_num, const char* cmd_name,
                                     microsh_cmd_fn cmd_fn, const char* desc) {
     if (msh == NULL || arg_num == 0 || cmd_name == NULL ||
             cmd_fn == NULL || strlen(cmd_name) == 0) {
@@ -113,7 +113,11 @@ microshr_t microsh_register_cmd(microsh_t* msh, size_t arg_num, const char* cmd_
  * \param[in,out]   msh: microSH instance
  * \return          \ref microshOK on success, member of \ref microshr_t otherwise
  */
-microshr_t microsh_unregister_all_cmd(microsh_t* msh) {
+microshr_t microsh_cmd_unregister_all(microsh_t* msh) {
+    if (msh == NULL) {
+        return microshERRPAR;
+    }
+
     memset(msh->cmds, 0x00, sizeof(msh->cmds));
     msh->cmds_index = 0;
 
@@ -132,7 +136,7 @@ microshr_t microsh_unregister_all_cmd(microsh_t* msh) {
  */
 microshr_t microsh_session_init(microsh_t* msh, const microsh_credentials_t* cred, size_t cred_num,
                                     microsh_logged_in_fn logged_in_cb) {
-    if (cred == NULL || cred_num > MICROSH_CFG_MAX_CREDENTIALS) {
+    if (msh == NULL || cred == NULL || cred_num > MICROSH_CFG_MAX_CREDENTIALS) {
         return microshERRPAR;
     }
 
@@ -149,6 +153,10 @@ microshr_t microsh_session_init(microsh_t* msh, const microsh_credentials_t* cre
  * \return          \ref microshOK on success, member of \ref microshr_t otherwise
  */
 microshr_t microsh_session_logout(microsh_t* msh) {
+    if (msh == NULL) {
+        return microshERRPAR;
+    }
+
     msh->session.status.login_type = 0;
     msh->session.status.attempt = MICROSH_CFG_MAX_AUTH_ATTEMPTS;
     msh->session.status.flags.logged_in = 0;
