@@ -94,7 +94,7 @@ microshr_t microsh_cmd_register(microsh_t* msh, size_t arg_num, const char* cmd_
     }
 
     /* Check for memory available */
-    if (msh->cmds_index > MICROSH_ARRAYSIZE(msh->cmds)) {
+    if (!(msh->cmds_index < MICROSH_ARRAYSIZE(msh->cmds))) {
         return microshERRMEM;
     }
 
