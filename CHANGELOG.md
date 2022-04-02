@@ -5,6 +5,10 @@
 
 
 
+## v1.1.1
+
+1.  Fix possible commands array overflow when registering too many commands
+
 ## v1.1.0
 
 1.  Change names for command-related APIs

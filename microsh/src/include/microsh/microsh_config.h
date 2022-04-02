@@ -21,7 +21,7 @@
  * This file is part of microSH - Shell for Embedded Systems library.
  *
  * Author:          Dmitry KARASEV <karasevsdmitry@yandex.ru>
- * Version:         1.1.0
+ * Version:         1.1.1
  */
 
 #ifndef MICROSH_HDR_DEFAULT_CONFIG_H
@@ -87,7 +87,7 @@ extern "C" {
 
 #define MICROSH_VERSION_MAJOR                 1
 #define MICROSH_VERSION_MINOR                 1
-#define MICROSH_VERSION_PATCH                 0
+#define MICROSH_VERSION_PATCH                 1
 
 #ifdef __cplusplus
 }
