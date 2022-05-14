@@ -1,4 +1,4 @@
 [submodule "3rdparty/microrl-remaster"]
     path = 3rdparty/microrl-remaster
     url = https://github.com/dimmykar/microrl-remaster.git
-    branch = v2.2.2
+    branch = v2.2.3
