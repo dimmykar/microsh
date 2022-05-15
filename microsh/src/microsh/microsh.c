@@ -357,7 +357,7 @@ static int prv_execute(microrl_t* mrl, int argc, const char* const *argv) {
     }
 
     /* Check for arguments */
-    if (argc > cmd->arg_num) {
+    if (argc > (int)cmd->arg_num) {
         return microshEXEC_ERROR_MAX_ARGS;
     }
 
@@ -380,6 +380,8 @@ static int prv_execute(microrl_t* mrl, int argc, const char* const *argv) {
  * \param[in]       argv: Pointer to argument list
  */
 void post_exec_hook(microrl_t* mrl, int res, int argc, const char* const *argv) {
+    MICROSH_UNUSED(argc);
+
 #if MICROSH_CFG_LOGGING_CMD_EXEC_RESULT
     microsh_execr_t exec_res = (microsh_execr_t)res;
 

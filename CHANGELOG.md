@@ -4,6 +4,7 @@
 ## Develop
 
 1.  Update `microrl-remaser` command line library to `v2.2.3`
+2.  Fix all possible warnings at compilation
 
 
 ## v1.1.1

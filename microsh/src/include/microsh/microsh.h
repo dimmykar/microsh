@@ -28,6 +28,7 @@
 #define MICROSH_HDR_H
 
 #include <stdint.h>
+#include <stddef.h>
 #include "microsh_config.h"
 #include "microrl.h"
 

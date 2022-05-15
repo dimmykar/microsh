@@ -276,6 +276,8 @@ static void save_sernum(void) {
  */
 int help_cmd(microsh_t* msh, int argc, const char* const *argv) {
     MICRORL_UNUSED(msh);
+    MICRORL_UNUSED(argc);
+    MICRORL_UNUSED(argv);
 
     print("MicroSH library DEMO v");
     print(_STM32_DEMO_VER);
@@ -312,6 +314,8 @@ int help_cmd(microsh_t* msh, int argc, const char* const *argv) {
  */
 int clear_screen_cmd(microsh_t* msh, int argc, const char* const *argv) {
     MICRORL_UNUSED(msh);
+    MICRORL_UNUSED(argc);
+    MICRORL_UNUSED(argv);
 
     print("\033[2J");    /* ESC seq for clear entire screen */
     print("\033[H");     /* ESC seq for move cursor at left-top corner */
@@ -329,8 +333,10 @@ int clear_screen_cmd(microsh_t* msh, int argc, const char* const *argv) {
  */
 int sernum_cmd(microsh_t* msh, int argc, const char* const *argv) {
     MICRORL_UNUSED(msh);
+    MICRORL_UNUSED(argc);
+    MICRORL_UNUSED(argv);
 
-    size_t i = 0;
+    int i = 0;
 
     if (++i < argc) {
         if (strcmp(argv[i], _SCMD_RD) == 0) {
@@ -358,6 +364,9 @@ int sernum_cmd(microsh_t* msh, int argc, const char* const *argv) {
  *                      \ref microsh_execr_t enumeration otherwise
  */
 int logout_cmd(microsh_t* msh, int argc, const char* const *argv) {
+    MICRORL_UNUSED(argc);
+    MICRORL_UNUSED(argv);
+
     microsh_session_logout(msh);
     microsh_cmd_unregister_all(msh);
     print("Logged out"_ENDLINE_SEQ);
