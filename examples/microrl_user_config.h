@@ -21,7 +21,7 @@
  * This file is part of MicroRL - Micro Read Line library for small and embedded devices.
  *
  * Authors:         Dmitry KARASEV <karasevsdmitry@yandex.ru>
- * Version:         2.2.3
+ * Version:         2.3.0
  */
 
 #ifndef MICRORL_HDR_USER_CONFIG_H
@@ -41,6 +41,8 @@ extern "C" {
 #define MICRORL_CFG_PROMPT_COLOR              "\033[32m"
 #define MICRORL_CFG_USE_COMPLETE              1
 #define MICRORL_CFG_USE_QUOTING               1
+#define MICRORL_CFG_USE_ECHO_OFF              1
+#define MICRORL_CFG_ECHO_OFF_MASK             '*'
 #define MICRORL_CFG_USE_HISTORY               1
 #define MICRORL_CFG_RING_HISTORY_LEN          64
 #define MICRORL_CFG_PRINT_BUFFER_LEN          40
