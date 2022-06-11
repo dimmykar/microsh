@@ -20,7 +20,7 @@
 # This file is part of MicroSH - Shell for Embedded Systems library.
 #
 # Author:          Dmitry KARASEV <karasevsdmitry@yandex.ru>
-# Version:         1.3.1
+# Version:         2.0.0-dev
 #
 ################################################################################
 
