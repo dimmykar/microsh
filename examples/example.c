@@ -22,7 +22,7 @@
  * This file is part of microSH - Shell for Embedded Systems library.
  *
  * Author:          Dmitry KARASEV <karasevsdmitry@yandex.ru>
- * Version:         1.2.0-dev
+ * Version:         1.2.0
  */
 
 #include <stdio.h>

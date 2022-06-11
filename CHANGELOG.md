@@ -3,6 +3,11 @@
 
 ## Develop
 
+
+
+
+## v1.2.0
+
 1.  Update `microrl-remaser` command line library to `v2.3.0`
 2.  Fix all possible warnings at compilation
 3.  Add Makefile for STM32 example
