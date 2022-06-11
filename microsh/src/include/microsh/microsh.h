@@ -55,12 +55,23 @@ extern "C" {
  */
 #define MICROSH_ARRAYSIZE(x)        (sizeof(x) / sizeof((x)[0]))
 
+/**
+ * \brief           MicroSH result enumeration
+ */
+typedef enum {
+    microshOK     = 0x00,                        /*!< Everything OK */
+    microshERR    = 0x01,                        /*!< Common error */
+    microshERRPAR = 0x02,                        /*!< Parameter error */
+    microshERRMEM = 0x03,                        /*!< Memory error */
+} microshr_t;
+
 typedef enum {
     microshEXEC_OK             = 0x00,          /*!< Successuful command execute */
     microshEXEC_NO_CMD         = 0x01,          /*!< Execute empty command */
-    microshEXEC_ERROR          = 0x02,          /*!< Command execute generic error */
-    microshEXEC_ERROR_UNK_CMD  = 0x03,          /*!< Unknown command */
-    microshEXEC_ERROR_MAX_ARGS = 0x04,          /*!< To many arguments in command */
+
+    microshEXEC_ERROR          = 0x10,          /*!< Command execute generic error */
+    microshEXEC_ERROR_UNK_CMD  = 0x11,          /*!< Unknown command */
+    microshEXEC_ERROR_MAX_ARGS = 0x12,          /*!< To many arguments in command */
 } microsh_execr_t;
 
 /* Forward declarations */
@@ -91,16 +102,6 @@ typedef struct {
     const char* desc;                           /*!< Command description for help */
     microsh_cmd_fn cmd_fn;                      /*!< Command execute function to call */
 } microsh_cmd_t;
-
-/**
- * \brief           MicroSH result enumeration
- */
-typedef enum {
-    microshOK = 0x00,                            /*!< Everything OK */
-    microshERR = 0x01,                           /*!< Common error */
-    microshERRPAR = 0x02,                        /*!< Parameter error */
-    microshERRMEM = 0x03,                        /*!< Memory error */
-} microshr_t;
 
 #if MICROSH_CFG_CONSOLE_SESSIONS
 /**
@@ -139,9 +140,9 @@ typedef struct {
  * \brief           MicroSH instance
  */
 typedef struct microsh {
-    microrl_t mrl;                               /*!< MicroRL context instance */
-    microsh_cmd_t cmds[MICROSH_CFG_NUM_OF_CMDS]; /*!< Array of all registered commands */
-    size_t cmds_index;                           /*!< Registered command index counter */
+    microrl_t         mrl;                       /*!< MicroRL context instance */
+    microsh_cmd_t     cmds[MICROSH_CFG_NUM_OF_CMDS]; /*!< Array of all registered commands */
+    size_t            cmds_index;                /*!< Registered command index counter */
 #if MICROSH_CFG_CONSOLE_SESSIONS
     microsh_session_t session;                   /*!< Console session context instance */
 #endif /* MICROSH_CFG_CONSOLE_SESSIONS */
