@@ -21,7 +21,7 @@
  * This file is part of microSH - Shell for Embedded Systems library.
  *
  * Author:          Dmitry KARASEV <karasevsdmitry@yandex.ru>
- * Version:         1.1.1
+ * Version:         1.3.0
  */
 
 #ifndef MICRORL_HDR_USER_CONFIG_H
