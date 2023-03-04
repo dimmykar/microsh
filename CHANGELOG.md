@@ -3,7 +3,7 @@
 
 ## Develop
 
-
+1.  Update `microrl-remaser` command line library to `v2.4.1`
 
 
 ## v1.2.0
