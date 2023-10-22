@@ -9,9 +9,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -83,7 +83,7 @@ static int logout_cmd(microsh_t* msh, int argc, const char* const *argv);
 void init(void) {
     LL_USART_InitTypeDef USART_InitStruct = {0};
     LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
-  
+
     USART_GPIO_ENABLE_CLOCK();
     USART_UART_ENABLE_CLOCK();
     __DSB();
@@ -188,7 +188,7 @@ char get_char(void) {
  */
 static void str_to_u32(char* str, uint32_t* val) {
     uint32_t temp = 0;
- 
+
     for (uint8_t i = 0; str[i] >= 0x30 && str[i] <= 0x39; ++i) {
         temp = temp + (str[i] & 0x0F);
         temp = temp * 10;
@@ -248,7 +248,7 @@ static void set_sernum(char* str_val) {
     str_to_u32(str_val, &sn);
     if (sn != 0) {
         device_sn = sn;
-        
+
         print("\tset S/N ");
         print(str_val);
         print(_ENDLINE_SEQ);
